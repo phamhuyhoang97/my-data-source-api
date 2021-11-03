@@ -31,7 +31,7 @@ class CustomDatasourceRelation(
         val schemaFields = schema.fields
 
         val rowsRdd = initialRdd.map(fileContent => {
-            val lines = fileContent.split("-")
+            val lines = fileContent.split("\\r?\\n")
             val data = lines.map(line => line.split("\\$").toSeq)
 
             val records = data.map(words => words.zipWithIndex.map {
@@ -54,7 +54,6 @@ class CustomDatasourceRelation(
         println("Selecting only required columns...")
         // An example, does not provide any specific performance benefits
         val initialRdd = sqlContext.sparkContext.wholeTextFiles(path).map(_._2)
-        println("DMMMMMMMMMMMMMMMMMMMMMMMMMM")
         initialRdd.collect().foreach(o => {
             val z = o.getBytes()
             z.foreach(println)
@@ -64,7 +63,7 @@ class CustomDatasourceRelation(
 
         val rowsRdd = initialRdd.map(fileContent => {
             println("CCCCCCCCCCCCCCCCCCCCC")
-            val lines = fileContent.split("-")
+            val lines = fileContent.split("\\r?\\n")
             lines.foreach(o => println(o))
             val data = lines.map(line => line.split("\\$").toSeq)
             data.foreach(o => println(o))
@@ -75,11 +74,21 @@ class CustomDatasourceRelation(
                     if (requiredColumns.contains(field.name)) Some(cast(value, field.dataType)) else None
             })
 
+            println("DDDDDDDDDDDDDDDDDDD")
             records
-                .map(record => record.filter(_.isDefined))
-                .map(record => Row.fromSeq(record))
+                .map(record => {
+                    println(record)
+                    println(record.getClass.toString())
+                    record.filter(_.isDefined)
+                })
+                .map(record => {
+                    println("zzzzzzz: " + record)
+                    println("xxxxxxx: " + record.getClass.toString())
+                    Row.fromSeq(record)
+                })
         })
 
+        println("HHHHHHHHHHHH")
         rowsRdd.flatMap(row => row)
     }
 

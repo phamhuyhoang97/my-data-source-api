@@ -2,10 +2,10 @@ package org.hoangph8.spark.ds.api
 
 import org.apache.hadoop.fs.Path
 import org.apache.spark.sql.{DataFrame, SQLContext, SaveMode}
-import org.apache.spark.sql.sources.{BaseRelation, CreatableRelationProvider, RelationProvider, SchemaRelationProvider}
+import org.apache.spark.sql.sources.{BaseRelation, CreatableRelationProvider, DataSourceRegister, RelationProvider, SchemaRelationProvider}
 import org.apache.spark.sql.types.StructType
 
-class DefaultSource extends RelationProvider with SchemaRelationProvider with CreatableRelationProvider {
+class DefaultSource extends DataSourceRegister with RelationProvider with SchemaRelationProvider with CreatableRelationProvider {
 
     // relation cho read
     override def createRelation(
@@ -61,4 +61,6 @@ class DefaultSource extends RelationProvider with SchemaRelationProvider with Cr
             case None => throw new IllegalArgumentException("The path parameter cannot be empty!")
         }
     }
+
+    override def shortName(): String = "hoang"
 }
