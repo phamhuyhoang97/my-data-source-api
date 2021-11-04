@@ -42,6 +42,7 @@ conf/*.sh
 conf/*.xml
 conf/java-opts
 conf/slaves
+data
 dependency-reduced-pom.xml
 derby.log
 dev/create-release/*final

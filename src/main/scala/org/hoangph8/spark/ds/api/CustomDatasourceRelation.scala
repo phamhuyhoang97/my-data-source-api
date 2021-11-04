@@ -17,12 +17,7 @@ class CustomDatasourceRelation(
         } else {
             // There is no user-defined schema.
             // You need to infer it on your own. E.g., read the header of CSV file.
-            StructType(
-                StructField("name", StringType, nullable = true) ::
-                    StructField("surname", StringType, nullable = true) ::
-                    StructField("salary", IntegerType, nullable = true) ::
-                    Nil
-            )
+            throw new IllegalArgumentException("Schema must be required!")
         }
     }
 
@@ -31,8 +26,7 @@ class CustomDatasourceRelation(
         val schemaFields = schema.fields
 
         val rowsRdd = initialRdd.map(fileContent => {
-            val lines = fileContent.split("\\r?\\n")
-            val data = lines.map(line => line.split("\\$").toSeq)
+            val data = parseData(fileContent)
 
             val records = data.map(words => words.zipWithIndex.map {
                 case (value, index) =>
@@ -40,7 +34,7 @@ class CustomDatasourceRelation(
                     val columnType = schemaFields(index).dataType
                     val castValue = columnType match {
                         case StringType => value
-                        case IntegerType => value.toInt
+                        case IntegerType => if(value.equals("")) 0 else value.toInt
                     }
                     castValue
             })
@@ -54,41 +48,20 @@ class CustomDatasourceRelation(
         println("Selecting only required columns...")
         // An example, does not provide any specific performance benefits
         val initialRdd = sqlContext.sparkContext.wholeTextFiles(path).map(_._2)
-        initialRdd.collect().foreach(o => {
-            val z = o.getBytes()
-            z.foreach(println)
-            println("++++++++++++++++++++++++++++++")
-        })
         val schemaFields = schema.fields
 
         val rowsRdd = initialRdd.map(fileContent => {
-            println("CCCCCCCCCCCCCCCCCCCCC")
-            val lines = fileContent.split("\\r?\\n")
-            lines.foreach(o => println(o))
-            val data = lines.map(line => line.split("\\$").toSeq)
-            data.foreach(o => println(o))
+            val data = parseData(fileContent)
 
             val records = data.map(words => words.zipWithIndex.map {
                 case (value, index) =>
                     val field = schemaFields(index)
-                    if (requiredColumns.contains(field.name)) Some(cast(value, field.dataType)) else None
+                    if (requiredColumns.contains(field.name)) Some(Util.cast(value, field.dataType)) else None
             })
 
-            println("DDDDDDDDDDDDDDDDDDD")
-            records
-                .map(record => {
-                    println(record)
-                    println(record.getClass.toString())
-                    record.filter(_.isDefined)
-                })
-                .map(record => {
-                    println("zzzzzzz: " + record)
-                    println("xxxxxxx: " + record.getClass.toString())
-                    Row.fromSeq(record)
-                })
+            records.map(record => Row.fromSeq(record.filter(_.isDefined).map(value => value.get)))
         })
 
-        println("HHHHHHHHHHHH")
         rowsRdd.flatMap(row => row)
     }
 
@@ -99,9 +72,13 @@ class CustomDatasourceRelation(
         buildScan(requiredColumns)
     }
 
-    private def cast(value: String, dataType: DataType) = dataType match {
-        case StringType => value
-        case IntegerType => value.toInt
+    private def parseData(fileContent: String): Array[Seq[String]] ={
+        val lines = fileContent.split("\\r?\\n")
+        val data = lines.map(line => {
+            val words = line.split(",").map(word => word.trim)
+            Seq(words(0),words(1),words(2),words(3),words(4))
+        })
+        data
     }
 
 }
