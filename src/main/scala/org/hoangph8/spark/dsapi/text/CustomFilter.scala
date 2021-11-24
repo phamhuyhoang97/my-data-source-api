@@ -1,4 +1,4 @@
-package org.hoangph8.spark.ds.api
+package org.hoangph8.spark.dsapi.text
 
 import org.apache.spark.sql.types.StructType
 

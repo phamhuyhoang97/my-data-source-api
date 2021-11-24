@@ -44,6 +44,24 @@
       <version>3.1.0</version>
     </dependency>
 
+    <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>8.0.27</version>
+    </dependency>
+
+
+    <!-- https://mvnrepository.com/artifact/org.scalikejdbc/scalikejdbc -->
+    <dependency>
+      <groupId>org.scalikejdbc</groupId>
+      <artifactId>scalikejdbc_2.12</artifactId>
+      <version>3.0.1</version>
+    </dependency>
+
+
+
+
   </dependencies>
 
   <build>
@@ -56,7 +74,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>org.hoangph8.spark.ds.api.MyDataSourceApp</mainClass>
+              <mainClass>org.hoangph8.spark.dsapi.jdbc.v1.JdbcDataSourceApp</mainClass>
             </manifest>
           </archive>
           <descriptorRefs>

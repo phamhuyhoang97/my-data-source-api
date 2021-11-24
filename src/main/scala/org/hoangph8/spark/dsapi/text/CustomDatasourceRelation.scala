@@ -1,9 +1,9 @@
-package org.hoangph8.spark.ds.api
+package org.hoangph8.spark.dsapi.text
 
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{Row, SQLContext}
 import org.apache.spark.sql.sources.{BaseRelation, Filter, PrunedFilteredScan, PrunedScan, TableScan}
-import org.apache.spark.sql.types.{DataType, IntegerType, StringType, StructField, StructType}
+import org.apache.spark.sql.types.{IntegerType, StringType, StructType}
 
 class CustomDatasourceRelation(
     override val sqlContext: SQLContext,

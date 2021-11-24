@@ -1,4 +1,4 @@
-package org.hoangph8.spark.ds.api
+package org.hoangph8.spark.dsapi.text
 
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit
 object MyDataSourceApp {
   def main(args : Array[String]) {
     val conf = new SparkConf().setAppName("spark-custom-datasource")
-    val spark = SparkSession.builder().config(conf).master("local[1]").getOrCreate()
+    val spark = SparkSession.builder().config(conf).master("local[2]").getOrCreate()
 
     val schema = StructType(
       StructField("date", StringType, nullable = true) ::

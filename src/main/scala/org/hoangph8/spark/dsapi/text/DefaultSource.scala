@@ -1,4 +1,4 @@
-package org.hoangph8.spark.ds.api
+package org.hoangph8.spark.dsapi.text
 
 import org.apache.hadoop.fs.Path
 import org.apache.spark.sql.{DataFrame, SQLContext, SaveMode}
