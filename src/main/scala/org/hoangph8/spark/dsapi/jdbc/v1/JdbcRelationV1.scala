@@ -1,7 +1,7 @@
 package org.hoangph8.spark.dsapi.jdbc.v1
 
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.sources.{BaseRelation, TableScan}
+import org.apache.spark.sql.sources.{BaseRelation, Filter, PrunedFilteredScan, TableScan}
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{Row, SQLContext}
 
@@ -12,7 +12,7 @@ class JdbcRelationV1(
     password: String,
     table: String,
     userschema: StructType
-  ) extends BaseRelation with TableScan{
+  ) extends BaseRelation with TableScan with PrunedFilteredScan{
   override def schema: StructType = {
     if (userschema != null) {
       // The user defined a schema, simply return it
@@ -25,6 +25,10 @@ class JdbcRelationV1(
   }
 
   override def buildScan(): RDD[Row] = {
-    new JdbcRDD(sqlContext, url, user, password, table)
+    new JdbcRDD(sqlContext, url, user, password, table, null, null)
+  }
+
+  override def buildScan(requiredColumns: Array[String], filters: Array[Filter]): RDD[Row] = {
+    new JdbcRDD(sqlContext, url, user, password, table, requiredColumns, filters)
   }
 }
