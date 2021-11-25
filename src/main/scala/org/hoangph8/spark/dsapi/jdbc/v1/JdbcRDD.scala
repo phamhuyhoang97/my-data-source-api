@@ -5,7 +5,7 @@ import org.apache.spark.sql.sources.{EqualTo, Filter}
 import org.apache.spark.sql.{Row, SQLContext}
 import org.apache.spark.{Partition, TaskContext}
 
-import java.sql.DriverManager
+import java.sql.{DriverManager, ResultSet}
 
 class JdbcRDD(
     sqlContext: SQLContext,
@@ -16,12 +16,12 @@ class JdbcRDD(
     columns: Array[String],
     filters: Array[Filter]) extends RDD[Row](sqlContext.sparkContext, Nil) {
   override def compute(split: Partition, context: TaskContext): Iterator[Row] = {
-    val conn = DriverManager.getConnection(url, user, password)
-    val stmt = conn.prepareStatement(s"SELECT * FROM $table")
-    val rs = stmt.executeQuery()
-
     val sqlBuilder = new StringBuilder()
-    sqlBuilder.append(s"SELECT ${columns.mkString(", ")} FROM $table")
+    if (columns.nonEmpty) {
+      sqlBuilder.append(s"SELECT ${columns.mkString(", ")} FROM $table")
+    } else {
+      sqlBuilder.append(s"SELECT * FROM $table")
+    }
 
     val wheres = filters.flatMap {
       case EqualTo(attribute, value) => Some(s"$attribute = '$value'")
@@ -33,19 +33,26 @@ class JdbcRDD(
 
     val sql = sqlBuilder.toString
 
-    context.addTaskCompletionListener(_ => conn.close())
+    val conn = DriverManager.getConnection(url, user, password)
+    val stmt = conn.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)
+    stmt.setFetchSize(1000)
+    val rs = stmt.executeQuery()
 
     new Iterator[Row] {
       def hasNext: Boolean = rs.next()
       def next: Row = {
-        val values = columns.map {
-          case "id" => rs.getInt("id")
-          case "emp_name" => rs.getString("emp_name")
-          case "dep_name" => rs.getString("dep_name")
-          case "salary" => rs.getBigDecimal("salary")
-          case "age" => rs.getBigDecimal("age")
+        if(columns.nonEmpty){
+          val values = columns.map {
+            case "id" => rs.getInt("id")
+            case "emp_name" => rs.getString("emp_name")
+            case "dep_name" => rs.getString("dep_name")
+            case "salary" => rs.getBigDecimal("salary")
+            case "age" => rs.getBigDecimal("age")
+          }
+          Row.fromSeq(values)
+        } else {
+          Row(rs.getInt("id"), rs.getString("emp_name"), rs.getString("dep_name"), rs.getBigDecimal("salary"), rs.getBigDecimal("age"))
         }
-        Row.fromSeq(values)
       }
     }
   }

@@ -25,7 +25,7 @@ class JdbcRelationV1(
   }
 
   override def buildScan(): RDD[Row] = {
-    new JdbcRDD(sqlContext, url, user, password, table, null, null)
+    new JdbcRDD(sqlContext, url, user, password, table, Array.empty, Array.empty)
   }
 
   override def buildScan(requiredColumns: Array[String], filters: Array[Filter]): RDD[Row] = {
