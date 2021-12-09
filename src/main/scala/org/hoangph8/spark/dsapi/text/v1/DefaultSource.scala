@@ -1,9 +1,9 @@
-package org.hoangph8.spark.dsapi.text
+package org.hoangph8.spark.dsapi.text.v1
 
 import org.apache.hadoop.fs.Path
-import org.apache.spark.sql.{DataFrame, SQLContext, SaveMode}
-import org.apache.spark.sql.sources.{BaseRelation, CreatableRelationProvider, DataSourceRegister, RelationProvider, SchemaRelationProvider}
+import org.apache.spark.sql.sources._
 import org.apache.spark.sql.types.StructType
+import org.apache.spark.sql.{DataFrame, SQLContext, SaveMode}
 
 class DefaultSource extends DataSourceRegister with RelationProvider with SchemaRelationProvider with CreatableRelationProvider {
 
