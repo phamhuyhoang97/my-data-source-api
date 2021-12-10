@@ -10,9 +10,9 @@ import org.apache.spark.sql.util.CaseInsensitiveStringMap
 
 import scala.collection.JavaConverters._
 
-class CsvTableBatchV2(path: String) extends SupportsRead {
+class CsvTableBatchV2(path: String, header: Boolean=true) extends SupportsRead {
   override def newScanBuilder(caseInsensitiveStringMap: CaseInsensitiveStringMap): ScanBuilder = {
-    new CsvScanBuilderV2(path)
+    new CsvScanBuilderV2(path, header)
   }
 
   override def name(): String = this.getClass.toString

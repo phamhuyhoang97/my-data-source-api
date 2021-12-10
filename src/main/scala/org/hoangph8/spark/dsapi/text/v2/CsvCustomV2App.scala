@@ -8,11 +8,11 @@ object CsvCustomV2App {
   def main(args: Array[String]): Unit = {
     val spark = SparkSession.builder().master("local[2]").appName("hihi").getOrCreate()
 
-    val simpleDF = spark.read.format("csv").option("header", "true").load("data/adult.csv")
+    val simpleDF = spark.read.format("csv-ds-v2").option("header", "true").load("data/us-counties.csv")
     simpleDF.printSchema()
     simpleDF.show()
 
-    simpleDF.groupBy("workclass").agg(sum("hours_per_week")).show
+    simpleDF.groupBy("county").agg(sum("cases")).show
 
     TimeUnit.MINUTES.sleep(10)
 

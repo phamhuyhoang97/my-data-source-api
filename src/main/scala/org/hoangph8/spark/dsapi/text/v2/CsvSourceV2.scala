@@ -15,7 +15,8 @@ class CsvSourceV2 extends TableProvider with DataSourceRegister{
 
   override def getTable(structType: StructType, transforms: Array[Transform], map: util.Map[String, String]): Table = {
     val path = map.get("path")
-    new CsvTableBatchV2(path)
+    if (map.containsKey("header")) new CsvTableBatchV2(path, map.get("header").toBoolean)
+    else new CsvTableBatchV2(path)
   }
 
   override def shortName(): String = "csv-ds-v2"

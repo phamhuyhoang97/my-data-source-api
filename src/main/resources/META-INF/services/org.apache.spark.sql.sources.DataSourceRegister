@@ -1,3 +1,4 @@
 org.hoangph8.spark.dsapi.text.v1.DefaultSource
 org.hoangph8.spark.dsapi.jdbc.v1.JdbcSourceV1
 org.hoangph8.spark.dsapi.text.v2.CsvSourceV2
+org.hoangph8.spark.dsapi.jdbc.v2.JdbcSourceV2
